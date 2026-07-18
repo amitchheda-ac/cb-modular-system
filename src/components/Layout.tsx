@@ -29,6 +29,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <Link to="/quotes/new" className="text-slate-600 hover:text-amber-800">New Quote</Link>
             {profile?.role === 'admin' && <Link to="/admin/presets" className="text-slate-600 hover:text-amber-800">Presets</Link>}
             {profile?.role === 'admin' && <Link to="/admin/rates" className="text-slate-600 hover:text-amber-800">Rates</Link>}
+            {profile?.role === 'admin' && <Link to="/admin/users" className="text-slate-600 hover:text-amber-800">Users</Link>}
             {profile && (
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${roleColor[profile.role] ?? ''}`}>
                 {profile.name || profile.username} · {profile.role}
