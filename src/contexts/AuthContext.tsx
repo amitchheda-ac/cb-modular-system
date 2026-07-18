@@ -11,7 +11,6 @@ interface AuthState {
   profile: Profile | null
   loading: boolean
   signIn: (username: string, password: string) => Promise<{ error: string | null }>
-  signUp: (username: string, name: string, password: string) => Promise<{ error: string | null }>
   signOut: () => Promise<void>
 }
 
@@ -46,21 +45,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }
 
-  async function signUp(username: string, name: string, password: string) {
-    const { error } = await supabase.auth.signUp({
-      email: usernameToEmail(username),
-      password,
-      options: { data: { username: username.trim().toLowerCase(), name } },
-    })
-    return { error: error?.message ?? null }
-  }
-
   async function signOut() {
     await supabase.auth.signOut()
   }
 
   return (
-    <AuthCtx.Provider value={{ session, profile, loading, signIn, signUp, signOut }}>
+    <AuthCtx.Provider value={{ session, profile, loading, signIn, signOut }}>
       {children}
     </AuthCtx.Provider>
   )
