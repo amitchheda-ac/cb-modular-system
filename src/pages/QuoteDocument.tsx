@@ -72,10 +72,14 @@ export function QuoteDocument() {
       </div>
 
       <div className="max-w-3xl mx-auto bg-white shadow-sm print:shadow-none rounded-lg print:rounded-none p-8">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4 mb-4">
-          <div>
-            <h1 className="text-xl font-bold text-amber-800">Casa Bianca</h1>
-            <p className="text-xs text-slate-500">{title}</p>
+        <div className="flex items-center justify-between border-b border-amber-200 pb-4 mb-4">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="Casa Bianca" className="w-12 h-12 object-contain" />
+            <div>
+              <h1 className="font-serif text-xl font-bold text-amber-800 leading-tight">Casa Bianca</h1>
+              <p className="text-[10px] tracking-[0.2em] text-amber-700/70 uppercase">Modular OS</p>
+              <p className="text-xs text-slate-500 mt-0.5">{title}</p>
+            </div>
           </div>
           <div className="text-right text-xs text-slate-500">
             <div>{quote.quote_no ?? quote.id}</div>
