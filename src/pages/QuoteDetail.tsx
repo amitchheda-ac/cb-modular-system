@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import type {
-  Category, Finish, Material, ModulePreset, Quotation, QuotationItem, QuotationTotals,
+  Category, Finish, Material, ModulePreset, Quotation, QuotationItem, QuotationTotals, Project, Customer, Factory,
 } from '../lib/types'
 
 const money = (n: number | null | undefined) => n == null ? '—' : `₹${Math.round(n).toLocaleString('en-IN')}`
@@ -14,6 +14,9 @@ export function QuoteDetail() {
   const isAdmin = profile?.role === 'admin'
 
   const [quote, setQuote] = useState<Quotation | null>(null)
+  const [project, setProject] = useState<Project | null>(null)
+  const [customer, setCustomer] = useState<Customer | null>(null)
+  const [factory, setFactory] = useState<Factory | null>(null)
   const [items, setItems] = useState<QuotationItem[]>([])
   const [totals, setTotals] = useState<QuotationTotals | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
@@ -41,6 +44,19 @@ export function QuoteDetail() {
     setQuote(q as Quotation)
     setItems((it as QuotationItem[]) ?? [])
     setTotals(t as QuotationTotals)
+
+    if (q?.factory_id) {
+      const { data: fac } = await supabase.from('factories').select('*').eq('id', q.factory_id).maybeSingle()
+      setFactory((fac as Factory) ?? null)
+    }
+    if (q?.project_id) {
+      const { data: p } = await supabase.from('projects').select('*').eq('id', q.project_id).maybeSingle()
+      setProject((p as Project) ?? null)
+      if (p?.customer_id) {
+        const { data: cu } = await supabase.from('customers').select('*').eq('id', p.customer_id).maybeSingle()
+        setCustomer((cu as Customer) ?? null)
+      }
+    }
   }, [id])
 
   useEffect(() => {
@@ -138,6 +154,8 @@ export function QuoteDetail() {
   return (
     <div className="grid lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-4">
+        <Link to="/" className="text-xs text-slate-500 hover:text-amber-800 inline-block">&larr; Back to all quotes</Link>
+
         <div className="bg-white border border-slate-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold text-slate-800">{quote.quote_no ?? quote.id}</h1>
@@ -147,6 +165,24 @@ export function QuoteDetail() {
             </div>
           </div>
           <p className="text-xs text-slate-500 mt-1">{quote.mode === 'predefined' ? 'Predefined' : 'Custom'} quote · v{quote.version}</p>
+
+          <div className="grid sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-100 text-sm">
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-slate-400">Customer</div>
+              <div className="text-slate-700 font-medium">{customer?.name ?? '—'}</div>
+              {customer?.mobile && <div className="text-xs text-slate-500">{customer.mobile}</div>}
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-slate-400">Project</div>
+              <div className="text-slate-700 font-medium">{project?.name ?? '—'}</div>
+              {project?.site_address && <div className="text-xs text-slate-500">{project.site_address}</div>}
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-wide text-slate-400">Factory</div>
+              <div className="text-slate-700 font-medium">{factory?.name ?? '—'}</div>
+              {factory?.city && <div className="text-xs text-slate-500">{factory.city}</div>}
+            </div>
+          </div>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-lg divide-y divide-slate-100">
@@ -264,7 +300,7 @@ export function QuoteDetail() {
           {!quote.price_locked && (
             <div className="mt-4">
               <label className="text-xs font-medium text-slate-600">
-                Discount % (up to {isAdmin ? '—' : maxDiscount}% without approval)
+                Discount % {isAdmin ? '(no limit — admin)' : `(up to ${maxDiscount}% without approval)`}
               </label>
               <input
                 type="number" min={0} max={isAdmin ? 100 : maxDiscount}

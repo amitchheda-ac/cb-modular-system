@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import type { Category, Finish, Material, Quotation, QuotationItem, QuotationTotals, Project, Customer } from '../lib/types'
@@ -59,16 +59,19 @@ export function QuoteDocument() {
 
   return (
     <div className="bg-slate-100 min-h-screen py-6 print:bg-white print:py-0">
-      <div className="max-w-3xl mx-auto mb-4 flex items-center justify-between print:hidden">
-        <div className="flex gap-2">
-          {(['client', 'sales', 'factory', 'designer'] as DocView[]).map((v) => (
-            <button key={v} onClick={() => setView(v)}
-              className={`text-xs px-3 py-1.5 rounded-full border capitalize ${view === v ? 'bg-amber-800 text-white border-amber-800' : 'border-slate-300 text-slate-600'}`}>
-              {v}
-            </button>
-          ))}
+      <div className="max-w-3xl mx-auto mb-4 print:hidden">
+        <Link to={`/quotes/${quote.id}`} className="text-xs text-slate-500 hover:text-amber-800 inline-block mb-3">&larr; Back to quote</Link>
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            {(['client', 'sales', 'factory', 'designer'] as DocView[]).map((v) => (
+              <button key={v} onClick={() => setView(v)}
+                className={`text-xs px-3 py-1.5 rounded-full border capitalize ${view === v ? 'bg-amber-800 text-white border-amber-800' : 'border-slate-300 text-slate-600'}`}>
+                {v}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => window.print()} className="bg-slate-800 text-white text-xs px-4 py-2 rounded-md">Print / Save PDF</button>
         </div>
-        <button onClick={() => window.print()} className="bg-slate-800 text-white text-xs px-4 py-2 rounded-md">Print / Save PDF</button>
       </div>
 
       <div className="max-w-3xl mx-auto bg-white shadow-sm print:shadow-none rounded-lg print:rounded-none p-8">

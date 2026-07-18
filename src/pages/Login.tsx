@@ -3,11 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export function Login() {
-  const { signIn, signUp } = useAuth()
+  const { signIn } = useAuth()
   const navigate = useNavigate()
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [username, setUsername] = useState('')
-  const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -16,18 +14,10 @@ export function Login() {
     e.preventDefault()
     setError(null)
     setBusy(true)
-    const result = mode === 'signin'
-      ? await signIn(username, password)
-      : await signUp(username, name, password)
+    const result = await signIn(username, password)
     setBusy(false)
     if (result.error) {
       setError(result.error)
-      return
-    }
-    if (mode === 'signup') {
-      setError(null)
-      setMode('signin')
-      alert('Account created. If you were pre-approved, your role is already set — sign in now.')
       return
     }
     navigate('/')
@@ -50,20 +40,10 @@ export function Login() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="e.g. amitchheda"
+              autoFocus
               required
             />
           </div>
-          {mode === 'signup' && (
-            <div>
-              <label className="text-xs font-medium text-slate-600">Full name</label>
-              <input
-                className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-amber-600 focus:border-amber-600"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-          )}
           <div>
             <label className="text-xs font-medium text-slate-600">Password</label>
             <input
@@ -71,7 +51,6 @@ export function Login() {
               className="mt-1 w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-amber-600 focus:border-amber-600"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
               required
             />
           </div>
@@ -81,16 +60,13 @@ export function Login() {
             disabled={busy}
             className="w-full bg-amber-800 text-white rounded-md py-2 text-sm font-medium hover:bg-amber-900 disabled:opacity-50 transition-colors"
           >
-            {busy ? 'Please wait...' : mode === 'signin' ? 'Sign in' : 'Create account'}
+            {busy ? 'Please wait...' : 'Sign in'}
           </button>
         </form>
 
-        <button
-          className="mt-4 text-xs text-slate-500 hover:text-amber-800 underline block mx-auto"
-          onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null) }}
-        >
-          {mode === 'signin' ? "First time here? Create your account" : 'Already have an account? Sign in'}
-        </button>
+        <p className="mt-5 text-[11px] text-slate-400 text-center leading-relaxed">
+          Accounts are created by an administrator only.<br />Contact Amit if you need access.
+        </p>
       </div>
     </div>
   )
