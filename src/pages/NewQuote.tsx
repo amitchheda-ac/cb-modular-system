@@ -68,19 +68,19 @@ export function NewQuote() {
         finalProjectId = data.id
       }
 
-      const { data: quote, error: qErr } = await supabase
+      const newQuoteId = crypto.randomUUID()
+      const { error: qErr } = await supabase
         .from('quotations')
         .insert({
+          id: newQuoteId,
           factory_id: factoryId,
           mode,
           project_id: finalProjectId,
           created_by: session?.user.id,
         })
-        .select()
-        .single()
       if (qErr) throw qErr
 
-      navigate(`/quotes/${quote.id}`)
+      navigate(`/quotes/${newQuoteId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
